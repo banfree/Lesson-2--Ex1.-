@@ -36,25 +36,42 @@ public class FirstTest
         driver.quit();
     }
 
+
     @Test
-    public void testStringInSearchLineAfterClick()
+    public void testShowingAndDisappearingSearchResults()
     {
         waitForElementAndClick(
-                By.id("org.wikipedia:id/search_container"),
+                By.xpath("//*[contains(@text,'Search Wikipedia')]"),
                 "Cannot find 'Search Wikipedia' input",
                 5
         );
-
-        WebElement searchline_element = waitForElementPresent(
+        waitForElementAndSendKeys(
                 By.xpath("//*[contains(@text,'Search…')]"),
-                "Cannot find 'Search…' text in the search bar before entering text",
+                "Java",
+                "Cannot find search input",
+                5
+        );
+        waitForElementPresent(
+                By.id("org.wikipedia:id/page_list_item_title"),
+                "Search did not find any articles for this word",
                 15
         );
-        String text_in_search_line = searchline_element.getAttribute ("text");
+
+        waitForElementAndClick(
+                By.id("org.wikipedia:id/search_close_btn"),
+                "Cannot find X to cancel search",
+                5
+        );
+        WebElement empty_search_page_element = waitForElementPresent(
+                By.xpath("//*[contains(@text, 'Search and read the free encyclopedia in your language')]"),
+                "Text that should have appeared after the search was canceled was not found",
+                15
+        );
+        String default_text_on_empty_search_page = empty_search_page_element.getAttribute ("text");
         Assert.assertEquals(
-                "We see unexpected text in the search line after click!",
-                "Search…",
-                text_in_search_line
+                "Text that should have appeared after the search was canceled was not found",
+                "Search and read the free encyclopedia in your language",
+                default_text_on_empty_search_page
         );
 
     }
