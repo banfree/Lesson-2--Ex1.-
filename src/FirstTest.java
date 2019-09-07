@@ -36,39 +36,54 @@ public class FirstTest {
     }
 
     @After
-    public void tearDown() {
-        driver.quit();
-    }
+    public void portraitOrientation() {driver.rotate(ScreenOrientation.PORTRAIT);} //my decision on this problem
+    public void tearDown() { driver.quit(); }
 
     @Test
-    public void checkingTitleElementInArticle() {
+    public void testCheckOrientationProblem() {
         waitForElementAndClick(
                 By.id("org.wikipedia:id/search_container"),
                 "Cannot find 'Search Wikipedia' input",
                 5
         );
+        String search_line = "Java";
 
         waitForElementAndSendKeys(
                 By.xpath("//*[contains(@text, 'Search…')]"),
-                "Java",
+                search_line,
                 "Cannot find search input",
                 5
         );
-
         waitForElementAndClick(
+
                 By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_container']//*[@text='Object-oriented programming language']"),
-                "Cannot find Java article description to open it",
-                5
-        );
-        int amount_of_search_results = getAmountOfElements(
-                By.id("org.wikipedia:id/view_page_title_text")
+                "Cannot find 'Object-oriented programming language' topic searching by " + search_line,
+                15
         );
 
-        Assert.assertTrue(
-                "We did not find any Title elements in the article!",
-                amount_of_search_results > 0
+        String title_before_rotation = waitForElementAndGetAttribute(
+                By.id("org.wikipedia:id/view_page_title_text"),
+                "text",
+                "Cannot find title of article",
+                15
+        );
+
+        driver.rotate(ScreenOrientation.LANDSCAPE);
+
+        String title_after_rotation = waitForElementAndGetAttribute(
+                By.id("org.wikipedia:id/view_page_title_text"),
+                "text",
+                "Cannot find title of article",
+                15
+        );
+
+        Assert.assertEquals(
+                "Article title have been changed after screen rotation",
+                title_before_rotation,
+                title_after_rotation
         );
     }
+
 
     private WebElement waitForElementPresent(By by, String error_message, long timeoutInSeconds) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
