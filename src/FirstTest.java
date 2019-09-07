@@ -16,6 +16,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.awt.*;
 import java.net.URL;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class FirstTest {
     private AppiumDriver driver;
@@ -40,178 +41,34 @@ public class FirstTest {
     }
 
     @Test
-    public void saveAndDeleteOneOfTwoArticlesInMyList() {
+    public void checkingTitleElementInArticle() {
         waitForElementAndClick(
                 By.id("org.wikipedia:id/search_container"),
-                "Cannot find 'Search Wikipedia' input (first search- Java article)",
+                "Cannot find 'Search Wikipedia' input",
                 5
         );
 
         waitForElementAndSendKeys(
                 By.xpath("//*[contains(@text, 'Search…')]"),
                 "Java",
-                "Cannot find search input (first search- Java article)",
+                "Cannot find search input",
                 5
         );
 
         waitForElementAndClick(
                 By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_container']//*[@text='Object-oriented programming language']"),
-                "Cannot find Java (first search) article description",
+                "Cannot find Java article description to open it",
                 5
+        );
+        int amount_of_search_results = getAmountOfElements(
+                By.id("org.wikipedia:id/view_page_title_text")
         );
 
-        waitForElementPresent(
-                By.id("org.wikipedia:id/view_page_title_text"),
-                "Cannot find article title (first search- Java article)",
-                15
+        Assert.assertTrue(
+                "We did not find any Title elements in the article!",
+                amount_of_search_results > 0
         );
-
-        waitForElementAndClick(
-                By.xpath("//android.widget.ImageView[@content-desc='More options']"),
-                "Cannot find button to open article options (first search- Java article)",
-                15
-        );
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        waitForElementAndClick(
-                By.xpath("//*[@text='Add to reading list']"),
-                "Cannot find option to add article to reading list (first search- Java article)",
-                5
-        );
-        waitForElementAndClick(
-                By.id("org.wikipedia:id/onboarding_button"),
-                "Cannot find 'Got it' tip overlay (first search- Java article)",
-                15
-        );
-        waitForElementAndClear(
-                By.id("org.wikipedia:id/text_input"),
-                "Cannot find input to set name of articles folder (first search- Java article)",
-                5
-        );
-
-        String name_of_folder = "Learning programming";
-        waitForElementAndSendKeys(
-                By.id("org.wikipedia:id/text_input"),
-                name_of_folder,
-                "Сannot put text into articles folder input (first search- Java article)",
-                5
-        );
-        waitForElementAndClick(
-                By.xpath("//*[@text='OK']"),
-                "Cannot press 'OK' button",
-                5
-        );
-        waitForElementAndClick(
-                By.xpath("//android.widget.ImageButton[@content-desc='Navigate up']"),
-                "Cannot close article, cannot find X link (first search- Java article)",
-                5
-        );
-        waitForElementAndClick(
-                By.id("org.wikipedia:id/search_container"),
-                "Cannot find 'Search Wikipedia' input (second search- JavaScript article)",
-                5
-        );
-
-        waitForElementAndSendKeys(
-                By.xpath("//*[contains(@text, 'Search…')]"),
-                "Java",
-                "Cannot find search input (second search- JavaScript article)",
-                5
-        );
-
-        waitForElementAndClick(
-                By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_container']//*[@text='Programming language']"),
-                "Cannot find JavaScript (second search) article description",
-                5
-        );
-
-        waitForElementPresent(
-                By.id("org.wikipedia:id/view_page_title_text"),
-                "Cannot find article title (second search- JavaScript article)",
-                15
-        );
-
-        waitForElementAndClick(
-                By.xpath("//android.widget.ImageView[@content-desc='More options']"),
-                "Cannot find button to open article options (second search- JavaScript article)",
-                5
-        );
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        waitForElementAndClick(
-                By.xpath("//*[@text='Add to reading list']"),
-                "Cannot find option to add article to reading list (second search- JavaScript article)",
-                5
-        );
-        waitForElementAndClick(
-                By.xpath("//*[@text='" + name_of_folder + "']"),
-                "Сannot add an article to an existing list (second search- JavaScript article)",
-                15
-        );
-        waitForElementAndClick(
-                By.xpath("//android.widget.ImageButton[@content-desc='Navigate up']"),
-                "Cannot close article, cannot find X link (second search- JavaScript article)",
-                5
-        );
-        waitForElementAndClick(
-                By.xpath("//android.widget.FrameLayout[@content-desc='My lists']"),
-                "Cannot find navigation button to My list",
-                5
-        );
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        waitForElementAndClick(
-                By.xpath("//*[@text='" + name_of_folder + "']"),
-                "Cannot find created folder",
-                15
-        );
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        swipeElementToLeft(
-                By.xpath("//*[@text='Java (programming language)']"),
-                "Cannot find saved article about Java to delete it"
-        );
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        waitForElementAndClick(
-                By.id("org.wikipedia:id/page_list_item_title"),
-                "Cannot find any articles after deleting article 'Java'",
-                5
-        );
-        WebElement article_title = waitForElementPresent(
-                By.xpath("//*[contains(@text,'JavaScript')]"),
-                "Cannot find 'JavaScript' in the article title",
-                15
-        );
-
-        String text_in_article_title = article_title.getAttribute("text");
-        Assert.assertEquals(
-                "We see unexpected title after clicking on article",
-                "JavaScript",
-                text_in_article_title
-        );
-
     }
-
 
     private WebElement waitForElementPresent(By by, String error_message, long timeoutInSeconds) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
@@ -309,14 +166,6 @@ public class FirstTest {
     private String waitForElementAndGetAttribute(By by, String attribute, String error_message, long timeoutInSeconds) {
         WebElement element = waitForElementPresent(by, error_message, timeoutInSeconds);
         return element.getAttribute(attribute);
-    }
-
-    private void assertElementPresent(By by, String error_message) {
-        int amount_of_elements = getAmountOfElements(by);
-        if (amount_of_elements == 1) {
-            String default_message = "An element ''" + by.toString() + " supposed to be not present";
-            throw new AssertionError(default_message + " " + error_message);
-        }
     }
 }
 
